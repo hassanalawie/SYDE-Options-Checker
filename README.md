@@ -1,6 +1,6 @@
 # AI and Computing Option Requirements Checker
 
-There are a lot of rules and requirements to get either the AI or Computing option, and you might have enough already to get one of these. This is a quick python script, that lets you quickly check.
+There are a lot of rules and requirements to get either the AI or Computing option, and you might have enough already to get one of these. This is a tool that lets you quickly check pls don't come 4 me if it is wrong :)
 
 ## Usage
 ### Website
