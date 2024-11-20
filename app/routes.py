@@ -46,7 +46,8 @@ def check_ai_requirements():
 
         # Check AI Option requirements
         result = ai_option.check_requirements(courses)
-        return jsonify({"meets_requirements": result}), 200
+
+        return jsonify(result), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -65,7 +66,8 @@ def check_computing_requirements():
 
         # Check Computing Option requirements
         result = computing_option.check_requirements(courses)
-        return jsonify({"meets_requirements": result}), 200
+
+        return jsonify(result), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

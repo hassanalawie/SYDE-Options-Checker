@@ -45,11 +45,11 @@ def main():
 
     parsed_courses = parse_courses(input_text)
     ai_option = AIOption()
-    option = ai_option.check_requirements(parsed_courses)
+    option = ai_option.check_requirements(parsed_courses)["meets_requirements"]
     print("AI Option" if option else "No AI Option")
 
     computing_option = ComputingOption()
-    option = computing_option.check_requirements(parsed_courses)
+    option = computing_option.check_requirements(parsed_courses)["meets_requirements"]
     print("Computing Option" if option else "No Computing Option")
 
 

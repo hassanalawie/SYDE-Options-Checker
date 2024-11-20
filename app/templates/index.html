@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Requirements Checker</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -55,7 +56,7 @@
     <script>
         async function checkRequirements(option) {
             const inputText = document.getElementById("courseInput").value;
-
+    
             // Call backend API with input
             const response = await fetch(`/check-${option}-requirements`, {
                 method: "POST",
@@ -64,16 +65,31 @@
                 },
                 body: JSON.stringify({ text: inputText })
             });
-
+    
             const data = await response.json();
             const resultDiv = document.getElementById("result");
-
+    
             if (response.ok) {
-                resultDiv.innerHTML = `<strong>Result:</strong> ${data.meets_requirements ? 'Requirements met' : 'Requirements not met'}`;
+                // Display overall result
+                if (data.meets_requirements) {
+                    resultDiv.innerHTML = `<strong>Result:</strong> Requirements met! 🎉`;
+                } else {
+                    let missingRequirements = data.missing_requirements.map(req => `<li>${req}</li>`).join('');
+                    console.log(missingRequirements)
+                    resultDiv.innerHTML = `
+                        <strong>Result:</strong> Requirements not met.<br>
+                        <strong>Details:</strong>
+                        <ul>
+                            ${missingRequirements}
+                        </ul>
+                    `;
+                }
             } else {
+                // Display error from API
                 resultDiv.innerHTML = `<strong>Error:</strong> ${data.error}`;
             }
         }
     </script>
+    
 </body>
 </html>

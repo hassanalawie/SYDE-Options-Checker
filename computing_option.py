@@ -181,35 +181,70 @@ class ComputingOption:
         self.list_1 = self.MSE_MSCI_fix(self.list_1)
         self.list_2 = self.MSE_MSCI_fix(self.list_2)
         self.list_3 = self.MSE_MSCI_fix(self.list_3)
-    def check_requirements(self, courses: List[Course]) -> bool:
+    def check_requirements(self, courses: List[Course]) -> dict:
         def extract_matches(target_list: List[Course], input_courses: List[Course], required_courses: int) -> List[Course]:
             matches = [course for course in input_courses if course in target_list]
             for match in matches[:required_courses]:
                 input_courses.remove(match)
             return matches
+
         def check_elective_coverage(option_courses: List[Course], coursesTaken: List[Course]) -> bool:
             union: List[Course] = []
             for course in coursesTaken:
                 if course in option_courses:
                     union.append(course)
-            nonElectiveCourses = []
-            for course in union:
-                if course not in requiredCourses["SYDE"]:
-                    nonElectiveCourses.append(course)
+            nonElectiveCourses = [course for course in union if course not in requiredCourses["SYDE"]]
             return len(nonElectiveCourses) >= 3
+
+        # Initialize results
+        results = {
+            "meets_list_1": False,
+            "meets_list_2": False,
+            "meets_list_3": False,
+            "meets_additional_courses": False,
+            "meets_elective_requirements": False,
+            "missing_requirements": []
+        }
+
         remaining_courses = courses.copy()
+
+        # Check List 1 requirement
         list_1_matches = extract_matches(self.list_1, remaining_courses, 1)
-        meets_list_1 = len(list_1_matches) >= 1
+        results["meets_list_1"] = len(list_1_matches) >= 1
+        if not results["meets_list_1"]:
+            results["missing_requirements"].append("List 1 requirement not met (at least 1 course).")
+
+        # Check List 2 requirement
         list_2_matches = extract_matches(self.list_2, remaining_courses, 1)
-        meets_list_2 = len(list_2_matches) >= 1
+        results["meets_list_2"] = len(list_2_matches) >= 1
+        if not results["meets_list_2"]:
+            results["missing_requirements"].append("List 2 requirement not met (at least 1 course).")
+
+        # Check List 3 requirement
         list_3_matches = extract_matches(self.list_3, remaining_courses, 2)
-        meets_list_3 = len(list_3_matches) >= 2
+        results["meets_list_3"] = len(list_3_matches) >= 2
+        if not results["meets_list_3"]:
+            results["missing_requirements"].append("List 3 requirement not met (at least 2 courses).")
+
+        # Check additional courses requirement
         additional_matches = extract_matches(self.list_1 + self.list_2 + self.list_3, remaining_courses, 2)
-        meets_additional_courses = len(additional_matches) >= 2
+        results["meets_additional_courses"] = len(additional_matches) >= 2
+        if not results["meets_additional_courses"]:
+            results["missing_requirements"].append("Additional courses requirement not met (at least 2 courses from any list).")
+
+        # Check elective coverage
         option_courses = self.list_1 + self.list_2 + self.list_3
-        meets_elective_requirements = check_elective_coverage(option_courses, courses)
-        if not (meets_list_1 and meets_list_2 and meets_list_3 and meets_additional_courses):
-            print("Overall requirements not satisfied.")
-        elif not meets_elective_requirements:
-            print("Elective requirements not satisfied.")
-        return meets_list_1 and meets_list_2 and meets_list_3 and meets_additional_courses and meets_elective_requirements
+        results["meets_elective_requirements"] = check_elective_coverage(option_courses, courses)
+        if not results["meets_elective_requirements"]:
+            results["missing_requirements"].append("Elective requirement not met (at least 3 elective courses).")
+
+        # Overall result
+        results["meets_requirements"] = all([
+            results["meets_list_1"],
+            results["meets_list_2"],
+            results["meets_list_3"],
+            results["meets_additional_courses"],
+            results["meets_elective_requirements"]
+        ])
+
+        return results
