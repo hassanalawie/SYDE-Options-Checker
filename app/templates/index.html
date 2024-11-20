@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Requirements Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        textarea, button {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .gif-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .gif-container img {
+            max-width: 50%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .gif-container p {
+            font-size: 0.9rem;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Course Requirements Checker</h1>
+    <form id="courseForm">
+        <label for="courseInput">Paste your course data below:</label><br>
+        <textarea id="courseInput" rows="10"></textarea><br>
+        <button type="button" onclick="checkRequirements('ai')">Check AI Option Requirements</button>
+        <button type="button" onclick="checkRequirements('computing')">Check Computing Option Requirements</button>
+    </form>
+    <div id="result" class="result"></div>
+
+    <!-- GIF Container -->
+    <div class="gif-container">
+        <p>Here's how to get your course data, really complicated stuff in the works here:</p>
+        <img src="/static/instructions.gif" alt="Instructions GIF">
+    </div>
+
+    <script>
+        async function checkRequirements(option) {
+            const inputText = document.getElementById("courseInput").value;
+
+            // Call backend API with input
+            const response = await fetch(`/check-${option}-requirements`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ text: inputText })
+            });
+
+            const data = await response.json();
+            const resultDiv = document.getElementById("result");
+
+            if (response.ok) {
+                resultDiv.innerHTML = `<strong>Result:</strong> ${data.meets_requirements ? 'Requirements met' : 'Requirements not met'}`;
+            } else {
+                resultDiv.innerHTML = `<strong>Error:</strong> ${data.error}`;
+            }
+        }
+    </script>
+</body>
+</html>
